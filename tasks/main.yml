@@ -1,0 +1,57 @@
+---
+# tasks file for zoneminder
+
+
+- name: Install Zoneminder Repository
+  block:
+    - name: zoneminder | apt key
+      ansible.builtin.get_url:
+        url: https://zmrepo.zoneminder.com/debian/archive-keyring.gpg
+        dest: /etc/apt/trusted.gpg.d/zoneminder.asc
+
+    - name: zoneminder | apt source
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/zoneminder.asc] https://zmrepo.zoneminder.com/debian/release-1.36 {{ ansible_distribution_release }}/"
+        state: present
+        update_cache: true
+  tags:
+    - install
+
+- name: Install packages for zoneminder
+  ansible.builtin.apt:
+    pkg:
+      - lsb-release
+      - gnupg2
+      - zoneminder=1.36.31-bullseye1
+  tags:
+    - install
+
+- name: Enable Authentication in zoneminder
+  ansible.builtin.copy:
+    dest: /etc/zm/conf.d/03-custom.conf
+    content: "ZM_OPT_USE_AUTH=1"
+    mode: "0644"
+
+- name: Set admin password
+  ansible.builtin.shell:
+    cmd: mysql -e "UPDATE Users set Password=PASSWORD('{{zoneminder_admin_pw}}') WHERE Username='admin'" zm && echo 1 > /root/.zm_pw_change
+    creates: /root/.zm_pw_change
+
+- name: Enable zoneminder service
+  ansible.builtin.service:
+    name: zoneminder
+    enabled: yes
+    state: started
+  tags:
+    - config
+    - service
+
+- name: Enable zoneminder apache-config
+  ansible.builtin.file:
+    dest: /etc/apache2/conf-enabled/zoneminder.conf
+    src: /etc/apache2/conf-available/zoneminder.conf
+    state: link
+  tags:
+    - config
+    - http
+  notify: apache-restart
