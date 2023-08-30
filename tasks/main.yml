@@ -11,7 +11,7 @@
 
     - name: zoneminder | apt source
       ansible.builtin.apt_repository:
-        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/zoneminder.asc] https://zmrepo.zoneminder.com/debian/release-1.36 {{ ansible_distribution_release }}/"
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/zoneminder.asc] https://zmrepo.zoneminder.com/debian/release-1.36 {{ zoneminder_debrelease }}/"
         state: present
         update_cache: true
   tags:
