@@ -16,6 +16,7 @@ It is possible to change the default admin-password:
 
 ```
 zoneminder_admin_pw: "zm_VERY_S3CURE_PASSW0RD"
+zoneminder_debrelease: "{{ansible_distribution_release}}"
 ```
 
 Dependencies
