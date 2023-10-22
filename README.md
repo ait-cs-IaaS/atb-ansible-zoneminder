@@ -12,11 +12,17 @@ This role requires a debian server and a respository that stores a vulnerable zo
 Role Variables
 --------------
 
-It is possible to change the default admin-password:
+It is possible to change the default admin-password or add a webcam:
 
 ```
 zoneminder_admin_pw: "zm_VERY_S3CURE_PASSW0RD"
 zoneminder_debrelease: "{{ansible_distribution_release}}"
+zoneminder_cams:
+  - name: cam-1
+    id: 3
+    url: rtsp://user:pass@hostname:8554/mystream
+    width: 1920
+    height: 1080
 ```
 
 Dependencies
